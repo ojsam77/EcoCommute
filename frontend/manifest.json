@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "EcoCommute - Smart Transit Assistant",
+  "version": "1.0.0",
+  "description": "Reduce your carbon footprint with smart public transit navigation",
+  "permissions": [
+    "storage",
+    "geolocation",
+    "alarms",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://*.transit-api.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.google.com/maps/*", "https://*.apple.com/maps/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "options_page": "options.html"
+}

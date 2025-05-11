@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoCommute - Achievements</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      width: 100%;
+      height: 100vh;
+      overflow-y: auto;
+      background-color: var(--light-gray);
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    
+    header {
+      margin-bottom: 32px;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .logo img {
+      width: 48px;
+      height: 48px;
+      margin-right: 16px;
+    }
+    
+    .logo h1 {
+      font-size: 24px;
+      color: var(--primary-color);
+    }
+    
+    .user-stats {
+      display: flex;
+      justify-content: space-between;
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    
+    .stat-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 8px;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: var(--dark-gray);
+    }
+    
+    .section-title {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+    }
+    
+    .section-title span {
+      margin-right: 8px;
+    }
+    
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    
+    .achievement-card {
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    
+    .achievement-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .achievement-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+    
+    .achievement-locked .achievement-icon {
+      opacity: 0.3;
+    }
+    
+    .achievement-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-color);
+    }
+    
+    .achievement-description {
+      font-size: 14px;
+      color: var(--dark-gray);
+      margin-bottom: 12px;
+    }
+    
+    .achievement-progress {
+      width: 100%;
+      height: 8px;
+      background-color: var(--light-gray);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background-color: var(--primary-color);
+      border-radius: 4px;
+    }
+    
+    .achievement-status {
+      font-size: 12px;
+      color: var(--dark-gray);
+    }
+    
+    .achievement-locked .achievement-title,
+    .achievement-locked .achievement-description,
+    .achievement-locked .achievement-status {
+      opacity: 0.5;
+    }
+    
+    .leaderboard {
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+    
+    .leaderboard-header {
+      display: grid;
+      grid-template-columns: 0.5fr 2fr 1fr 1fr;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--light-gray);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    
+    .leaderboard-item {
+      display: grid;
+      grid-template-columns: 0.5fr 2fr 1fr 1fr;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--light-gray);
+      align-items: center;
+    }
+    
+    .leaderboard-item:last-child {
+      border-bottom: none;
+    }
+    
+    .rank {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    
+    .user {
+      display: flex;
+      align-items: center;
+    }
+    
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--accent-color);
+      color: var(--white);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 12px;
+      font-weight: 600;
+    }
+    
+    .current-user {
+      background-color: var(--light-gray);
+    }
+    
+    .co2-saved {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <img src="icons/icon128.png" alt="EcoCommute Logo">
+        <h1>EcoCommute Achievements</h1>
+      </div>
+    </header>
+    
+    <div class="user-stats">
+      <div class="stat-card">
+        <div class="stat-value" id="co2-saved">0</div>
+        <div class="stat-label">kg CO₂ Saved</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="trips-taken">0</div>
+        <div class="stat-label">Green Trips</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="achievements-earned">0/12</div>
+        <div class="stat-label">Achievements</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="eco-rank">Beginner</div>
+        <div class="stat-label">Eco Rank</div>
+      </div>
+    </div>
+    
+    <h2 class="section-title"><span>🏆</span> Your Achievements</h2>
+    
+    <div class="achievements-grid" id="achievements-container">
+      <!-- Achievements will be populated here -->
+    </div>
+    
+    <h2 class="section-title"><span>🏅</span> Community Leaderboard</h2>
+    
+    <div class="leaderboard">
+      <div class="leaderboard-header">
+        <div>Rank</div>
+        <div>User</div>
+        <div>Trips</div>
+        <div>CO₂ Saved</div>
+      </div>
+      <div id="leaderboard-container">
+        <!-- Leaderboard will be populated here -->
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Get user profile from storage
+      chrome.storage.sync.get(['userProfile'], result => {
+        const userProfile = result.userProfile || {
+          name: 'Guest',
+          co2Saved: 0,
+          tripsTaken: 0,
+          ecoRank: 'Beginner'
+        };
+        
+        // Update user stats
+        document.getElementById('co2-saved').textContent = userProfile.co2Saved.toFixed(1);
+        document.getElementById('trips-taken').textContent = userProfile.tripsTaken;
+        document.getElementById('eco-rank').textContent = userProfile.ecoRank || 'Beginner';
+        
+        // Calculate achievements earned
+        const achievementsEarned = calculateAchievementsEarned(userProfile);
+        document.getElementById('achievements-earned').textContent = `${achievementsEarned}/12`;
+        
+        // Populate achievements
+        populateAchievements(userProfile);
+        
+        // Populate leaderboard
+        populateLeaderboard(userProfile);
+      });
+    });
+    
+    function calculateAchievementsEarned(profile) {
+      let earned = 0;
+      
+      if (profile.tripsTaken >= 1) earned++; // First Trip
+      if (profile.tripsTaken >= 10) earned++; // Regular Commuter
+      if (profile.tripsTaken >= 50) earned++; // Transit Pro
+      if (profile.tripsTaken >= 100) earned++; // Transit Master
+      
+      if (profile.co2Saved >= 1) earned++; // Carbon Saver
+      if (profile.co2Saved >= 10) earned++; // Carbon Champion
+      if (profile.co2Saved >= 50) earned++; // Climate Hero
+      if (profile.co2Saved >= 100) earned++; // Climate Superhero
+      
+      // Assume other achievements are not yet earned
+      
+      return earned;
+    }
+    
+    function populateAchievements(profile) {
+      const achievements = [
+        {
+          icon: '🚶',
+          title: 'First Step',
+          description: 'Complete your first eco-friendly trip',
+          progress: profile.tripsTaken >= 1 ? 100 : (profile.tripsTaken * 100),
+          current: Math.min(profile.tripsTaken, 1),
+          target: 1,
+          unlocked: profile.tripsTaken >= 1
+        },
+        {
+          icon: '🚌',
+          title: 'Regular Commuter',
+          description: 'Complete 10 eco-friendly trips',
+          progress: Math.min(profile.tripsTaken / 10 * 100, 100),
+          current: Math.min(profile.tripsTaken, 10),
+          target: 10,
+          unlocked: profile.tripsTaken >= 10
+        },
+        {
+          icon: '🚆',
+          title: 'Transit Pro',
+          description: 'Complete 50 eco-friendly trips',
+          progress: Math.min(profile.tripsTaken / 50 * 100, 100),
+          current: Math.min(profile.tripsTaken, 50),
+          target: 50,
+          unlocked: profile.tripsTaken >= 50
+        },
+        {
+          icon: '🚇',
+          title: 'Transit Master',
+          description: 'Complete 100 eco-friendly trips',
+          progress: Math.min(profile.tripsTaken / 100 * 100, 100),
+          current: Math.min(profile.tripsTaken, 100),
+          target: 100,
+          unlocked: profile.tripsTaken >= 100
+        },
+        {
+          icon: '🌱',
+          title: 'Carbon Saver',
+          description: 'Save 1kg of CO₂ emissions',
+          progress: Math.min(profile.co2Saved / 1 * 100, 100),
+          current: Math.min(profile.co2Saved, 1).toFixed(1),
+          target: 1,
+          unlocked: profile.co2Saved >= 1
+        },
+        {
+          icon: '🌿',
+          title: 'Carbon Champion',
+          description: 'Save 10kg of CO₂ emissions',
+          progress: Math.min(profile.co2Saved / 10 * 100, 100),
+          current: Math.min(profile.co2Saved, 10).toFixed(1),
+          target: 10,
+          unlocked: profile.co2Saved >= 10
+        },
+        {
+          icon: '🌳',
+          title: 'Climate Hero',
+          description: 'Save 50kg of CO₂ emissions',
+          progress: Math.min(profile.co2Saved / 50 * 100, 100),
+          current: Math.min(profile.co2Saved, 50).toFixed(1),
+          target: 50,
+          unlocked: profile.co2Saved >= 50
+        },
+        {
+          icon: '🌍',
+          title: 'Climate Superhero',
+          description: 'Save 100kg of CO₂ emissions',
+          progress: Math.min(profile.co2Saved / 100 * 100, 100),
+          current: Math.min(profile.co2Saved, 100).toFixed(1),
+          target: 100,
+          unlocked: profile.co2Saved >= 100
+        },
+        {
+          icon: '🚲',
+          title: 'Bike Enthusiast',
+          description: 'Choose bike routes 5 times',
+          progress: 0,
+          current: 0,
+          target: 5,
+          unlocked: false
+        },
+        {
+          icon: '📱',
+          title: 'App Explorer',
+          description: 'Try all transit modes',
+          progress: 20,
+          current: 1,
+          target: 5,
+          unlocked: false
+        },
+        {
+          icon: '🔄',
+          title: 'Consistent Commuter',
+          description: 'Use EcoCommute for 5 days in a row',
+          progress: 0,
+          current: 0,
+          target: 5,
+          unlocked: false
+        },
+        {
+          icon: '🌟',
+          title: 'Eco Influencer',
+          description: 'Share your stats on social media',
+          progress: 0,
+          current: 0,
+          target: 1,
+          unlocked: false
+        }
+      ];
+      
+      const achievementsContainer = document.getElementById('achievements-container');
+      achievementsContainer.innerHTML = '';
+      
+      achievements.forEach(achievement => {
+        const card = document.createElement('div');
+        card.className = `achievement-card ${achievement.unlocked ? '' : 'achievement-locked'}`;
+        
+        card.innerHTML = `
+          <div class="achievement-icon">${achievement.icon}</div>
+          <div class="achievement-title">${achievement.title}</div>
+          <div class="achievement-description">${achievement.description}</div>
+          <div class="achievement-progress">
+            <div class="progress-bar" style="width: ${achievement.progress}%"></div>
+          </div>
+          <div class="achievement-status">${achievement.current}/${achievement.target}</div>
+        `;
+        
+        achievementsContainer.appendChild(card);
+      });
+    }
+    
+    function populateLeaderboard(userProfile) {
+      // Mock leaderboard data
+      const leaderboardData = [
+        { rank: 1, name: 'EcoWarrior', initial: 'E', tripsTaken: 152, co2Saved: 187.5 },
+        { rank: 2, name: 'GreenCommuter', initial: 'G', tripsTaken: 134, co2Saved: 165.2 },
+        { rank: 3, name: 'TransitFan', initial: 'T', tripsTaken: 121, co2Saved: 148.7 },
+        { rank: 4, name: 'EarthSaver', initial: 'E', tripsTaken: 98, co2Saved: 120.3 },
+        { rank: 5, name: 'BusRider', initial: 'B', tripsTaken: 87, co2Saved: 107.1 }
+      ];
+      
+      // Add current user if logged in
+      if (userProfile.name !== 'Guest') {
+        // Find appropriate rank based on CO2 saved
+        let userRank = leaderboardData.length + 1;
+        for (let i = 0; i < leaderboardData.length; i++) {
+          if (userProfile.co2Saved > leaderboardData[i].co2Saved) {
+            userRank = i + 1;
+            break;
+          }
+        }
+        
+        // Add user to leaderboard data
+        leaderboardData.splice(userRank - 1, 0, {
+          rank: userRank,
+          name: userProfile.name,
+          initial: userProfile.name.charAt(0).toUpperCase(),
+          tripsTaken: userProfile.tripsTaken,
+          co2Saved: userProfile.co2Saved,
+          isCurrentUser: true
+        });
+        
+        // Update ranks after insertion
+        for (let i = 0; i < leaderboardData.length; i++) {
+          leaderboardData[i].rank = i + 1;
+        }
+      }
+      
+      const leaderboardContainer = document.getElementById('leaderboard-container');
+      leaderboardContainer.innerHTML = '';
+      
+      leaderboardData.forEach(user => {
+        const item = document.createElement('div');
+        item.className = `leaderboard-item ${user.isCurrentUser ? 'current-user' : ''}`;
+        
+        item.innerHTML = `
+          <div class="rank">#${user.rank}</div>
+          <div class="user">
+            <div class="user-avatar">${user.initial}</div>
+            <div>${user.name}${user.isCurrentUser ? ' (You)' : ''}</div>
+          </div>
+          <div>${user.tripsTaken}</div>
+          <div class="co2-saved">${user.co2Saved.toFixed(1)} kg</div>
+        `;
+        
+        leaderboardContainer.appendChild(item);
+      });
+    }
+  </script>
+</body>
+</html>

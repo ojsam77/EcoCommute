@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoCommute - Login</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      width: 100%;
+      height: 100vh;
+      overflow-y: auto;
+      background-color: var(--light-gray);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .login-container {
+      width: 400px;
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+    
+    .login-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    
+    .login-header img {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+    }
+    
+    .login-header h1 {
+      font-size: 24px;
+      color: var(--primary-color);
+    }
+    
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .form-group label {
+      font-size: 14px;
+      color: var(--text-color);
+    }
+    
+    .form-group input {
+      padding: 12px;
+      border: 1px solid var(--medium-gray);
+      border-radius: var(--border-radius);
+      font-size: 16px;
+    }
+    
+    .login-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+    
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .forgot-password {
+      color: var(--accent-color);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    
+    .forgot-password:hover {
+      text-decoration: underline;
+    }
+    
+    .login-button {
+      margin-top: 16px;
+    }
+    
+    .signup-link {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--dark-gray);
+    }
+    
+    .signup-link a {
+      color: var(--accent-color);
+      text-decoration: none;
+    }
+    
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+    
+    .social-login {
+      margin-top: 24px;
+      text-align: center;
+    }
+    
+    .social-login p {
+      font-size: 14px;
+      color: var(--dark-gray);
+      margin-bottom: 16px;
+      position: relative;
+    }
+    
+    .social-login p::before,
+    .social-login p::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 30%;
+      height: 1px;
+      background-color: var(--medium-gray);
+    }
+    
+    .social-login p::before {
+      left: 0;
+    }
+    
+    .social-login p::after {
+      right: 0;
+    }
+    
+    .social-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+    
+    .social-button {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: var(--light-gray);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .social-button:hover {
+      background-color: var(--medium-gray);
+    }
+
+    .test-accounts {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 5px;
+    }
+
+    .test-accounts h3 {
+      margin-top: 0;
+      font-size: 16px;
+      color: #495057;
+    }
+
+    .test-accounts ul {
+      padding-left: 20px;
+      margin-bottom: 0;
+    }
+
+    .test-accounts li {
+      margin-bottom: 5px;
+    }
+
+    .status-message {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <img src="icons/icon128.png" alt="EcoCommute Logo">
+      <h1>Welcome to EcoCommute</h1>
+    </div>
+    
+    <div id="status-message" class="status-message"></div>
+    
+    <form class="login-form" id="login-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter your username" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+      </div>
+      
+      <div class="login-options">
+        <div class="remember-me">
+          <input type="checkbox" id="remember-me">
+          <label for="remember-me">Remember me</label>
+        </div>
+        <a href="#" class="forgot-password">Forgot password?</a>
+      </div>
+      
+      <button type="submit" class="primary-button login-button">Login</button>
+    </form>
+    
+    <div class="signup-link">
+      Don't have an account? <a href="#">Sign up</a>
+    </div>
+    
+    <div class="test-accounts">
+      <h3>Test Accounts</h3>
+      <ul>
+        <li><strong>Beta User:</strong> username: newuser / password: 2025DEVChallenge</li>
+        <li><strong>Admin:</strong> username: admin / password: 2025DEVChallenge</li>
+      </ul>
+      <button id="quick-login-beta" class="primary-button" style="margin-top: 10px; background-color: #6c757d;">Quick Login as Beta</button>
+      <button id="quick-login-admin" class="primary-button" style="margin-top: 10px; background-color: #6c757d;">Quick Login as Admin</button>
+    </div>
+  </div>
+  
+  <script src="login.js"></script>
+</body>
+</html>

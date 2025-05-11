@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoCommute</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <img src="icons/icon48.png" alt="EcoCommute Logo">
+        <h1>EcoCommute</h1>
+      </div>
+      <div class="user-profile">
+        <span id="user-name">Guest</span>
+        <button id="login-button">Login</button>
+      </div>
+    </header>
+
+    <div class="search-container">
+      <div class="input-group">
+        <label for="start-location">Start</label>
+        <input type="text" id="start-location" placeholder="Current location">
+      </div>
+      <div class="input-group">
+        <label for="destination">Destination</label>
+        <input type="text" id="destination" placeholder="Where to?">
+      </div>
+      <div class="input-group">
+        <label for="departure-time">Departure</label>
+        <input type="datetime-local" id="departure-time">
+      </div>
+      <button id="search-button" class="primary-button">Find Routes</button>
+    </div>
+
+    <div class="routes-container" id="routes-list">
+      <!-- Routes will be populated here -->
+      <div class="empty-state">
+        <p>Enter your destination to find eco-friendly routes</p>
+      </div>
+    </div>
+
+    <div class="eco-stats">
+      <h3>Your Eco Impact</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-value" id="co2-saved">0</span>
+          <span class="stat-label">kg CO₂ Saved</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="trips-taken">0</span>
+          <span class="stat-label">Green Trips</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="eco-rank">--</span>
+          <span class="stat-label">Community Rank</span>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <button id="settings-button" class="icon-button">⚙️</button>
+      <button id="achievements-button" class="icon-button">🏆</button>
+      <button id="share-button" class="icon-button">📤</button>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoCommute Options</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      color: #2e7d32;
+      border-bottom: 2px solid #2e7d32;
+      padding-bottom: 10px;
+    }
+    
+    .option-group {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+    }
+    
+    .option-group h2 {
+      margin-top: 0;
+      color: #1b5e20;
+    }
+    
+    label {
+      display: block;
+      margin: 10px 0;
+    }
+    
+    input[type="checkbox"], input[type="radio"] {
+      margin-right: 10px;
+    }
+    
+    input[type="range"] {
+      width: 100%;
+    }
+    
+    button {
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    
+    button:hover {
+      background-color: #1b5e20;
+    }
+    
+    .save-status {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 4px;
+      display: none;
+    }
+    
+    .success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>EcoCommute Settings</h1>
+    
+    <div class="option-group">
+      <h2>Transit Preferences</h2>
+      <label>
+        <input type="checkbox" id="bus" checked> Bus
+      </label>
+      <label>
+        <input type="checkbox" id="subway" checked> Subway/Metro
+      </label>
+      <label>
+        <input type="checkbox" id="train" checked> Train
+      </label>
+      <label>
+        <input type="checkbox" id="tram" checked> Tram/Light Rail
+      </label>
+      <label>
+        <input type="checkbox" id="ferry"> Ferry
+      </label>
+    </div>
+    
+    <div class="option-group">
+      <h2>Walking Distance</h2>
+      <label for="walkingDistance">Maximum walking distance: <span id="walkingDistanceValue">1000</span> meters</label>
+      <input type="range" id="walkingDistance" min="250" max="2000" step="250" value="1000">
+    </div>
+    
+    <div class="option-group">
+      <h2>Carbon Tracking</h2>
+      <label>
+        <input type="checkbox" id="carbonTracking" checked> Enable carbon savings tracking
+      </label>
+      <label>
+        <input type="checkbox" id="shareAchievements"> Share achievements with community
+      </label>
+    </div>
+    
+    <div class="option-group">
+      <h2>Notifications</h2>
+      <label>
+        <input type="checkbox" id="notifications" checked> Enable notifications
+      </label>
+      <label>
+        <input type="checkbox" id="delayAlerts" checked> Transit delay alerts
+      </label>
+      <label>
+        <input type="checkbox" id="crowdingAlerts"> Crowding alerts
+      </label>
+      <label>
+        <input type="checkbox" id="carbonMilestones" checked> Carbon saving milestones
+      </label>
+    </div>
+    
+    <div class="option-group">
+      <h2>Data Privacy</h2>
+      <label>
+        <input type="checkbox" id="anonymousData" checked> Share anonymous usage data to improve service
+      </label>
+      <label>
+        <input type="checkbox" id="locationHistory"> Store location history (improves recommendations)
+      </label>
+    </div>
+    
+    <button id="saveButton">Save Settings</button>
+    <div id="saveStatus" class="save-status">Settings saved successfully!</div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

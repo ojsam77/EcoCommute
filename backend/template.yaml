@@ -1,0 +1,262 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: EcoCommute - Smart Public Transit Navigation Assistant Backend
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 128
+    Runtime: nodejs18.x
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        LOG_LEVEL: INFO
+        TRANSIT_API_KEY: '{{resolve:ssm:/ecocommute/transit-api-key:1}}'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - test
+      - prod
+    Description: Deployment environment
+
+Resources:
+  # API Gateway
+  EcoCommuteApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Environment
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt UserPool.Arn
+
+  # Cognito User Pool
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub EcoCommute-UserPool-${Environment}
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+        - Name: name
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+          RequireUppercase: true
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub EcoCommute-Client-${Environment}
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      PreventUserExistenceErrors: ENABLED
+
+  # DynamoDB Tables
+  UserProfilesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub EcoCommute-UserProfiles-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  SavedRoutesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub EcoCommute-SavedRoutes-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: routeId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: routeId
+          KeyType: RANGE
+
+  UserAchievementsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub EcoCommute-Achievements-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: achievementId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: achievementId
+          KeyType: RANGE
+
+  # Lambda Functions
+  RouteOptimizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/route-optimizer/
+      Handler: index.handler
+      Description: Optimizes transit routes based on user preferences and eco-impact
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UserProfilesTable
+      Environment:
+        Variables:
+          USER_PROFILES_TABLE: !Ref UserProfilesTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EcoCommuteApi
+            Path: /routes/optimize
+            Method: post
+
+  CarbonCalculatorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/carbon-calculator/
+      Handler: index.handler
+      Description: Calculates carbon savings for transit routes
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EcoCommuteApi
+            Path: /carbon/calculate
+            Method: post
+
+  UserProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/user-profile/
+      Handler: index.handler
+      Description: Manages user profiles and preferences
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserProfilesTable
+      Environment:
+        Variables:
+          USER_PROFILES_TABLE: !Ref UserProfilesTable
+      Events:
+        GetProfile:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EcoCommuteApi
+            Path: /users/{userId}
+            Method: get
+        UpdateProfile:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EcoCommuteApi
+            Path: /users/{userId}
+            Method: put
+
+  SaveRouteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/save-route/
+      Handler: index.handler
+      Description: Saves user routes and updates eco-impact statistics
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SavedRoutesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserProfilesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserAchievementsTable
+      Environment:
+        Variables:
+          SAVED_ROUTES_TABLE: !Ref SavedRoutesTable
+          USER_PROFILES_TABLE: !Ref UserProfilesTable
+          ACHIEVEMENTS_TABLE: !Ref UserAchievementsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EcoCommuteApi
+            Path: /routes/save
+            Method: post
+
+  TransitDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/transit-data/
+      Handler: index.handler
+      Description: Fetches real-time transit data from external APIs
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EcoCommuteApi
+            Path: /transit/{provider}/{endpoint}
+            Method: get
+            Auth:
+              Authorizer: NONE
+
+  # Step Functions
+  RouteOptimizationWorkflow:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: statemachines/route-optimization.asl.json
+      Role: !GetAtt StepFunctionsExecutionRole.Arn
+
+  # IAM Roles
+  StepFunctionsExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub https://${EcoCommuteApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/
+  
+  UserPoolId:
+    Description: Cognito User Pool ID
+    Value: !Ref UserPool
+  
+  UserPoolClientId:
+    Description: Cognito User Pool Client ID
+    Value: !Ref UserPoolClient

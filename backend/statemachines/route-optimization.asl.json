@@ -1,0 +1,74 @@
+{
+  "Comment": "EcoCommute Route Optimization Workflow",
+  "StartAt": "FetchUserPreferences",
+  "States": {
+    "FetchUserPreferences": {
+      "Type": "Task",
+      "Resource": "${UserProfileFunction}",
+      "Parameters": {
+        "operation": "getPreferences",
+        "userId.$": "$.userId"
+      },
+      "ResultPath": "$.userPreferences",
+      "Next": "FetchTransitData",
+      "Catch": [
+        {
+          "ErrorEquals": ["UserNotFoundError"],
+          "ResultPath": "$.userPreferences",
+          "Next": "FetchTransitData"
+        }
+      ]
+    },
+    "FetchTransitData": {
+      "Type": "Task",
+      "Resource": "${TransitDataFunction}",
+      "Parameters": {
+        "startLocation.$": "$.startLocation",
+        "endLocation.$": "$.endLocation",
+        "departureTime.$": "$.departureTime"
+      },
+      "ResultPath": "$.transitData",
+      "Next": "FetchWeatherData"
+    },
+    "FetchWeatherData": {
+      "Type": "Task",
+      "Resource": "${WeatherDataFunction}",
+      "Parameters": {
+        "location.$": "$.startLocation",
+        "time.$": "$.departureTime"
+      },
+      "ResultPath": "$.weatherData",
+      "Next": "OptimizeRoutes"
+    },
+    "OptimizeRoutes": {
+      "Type": "Task",
+      "Resource": "${RouteOptimizerFunction}",
+      "Parameters": {
+        "transitData.$": "$.transitData",
+        "weatherData.$": "$.weatherData",
+        "userPreferences.$": "$.userPreferences",
+        "priorityFactors.$": "$.priorityFactors"
+      },
+      "ResultPath": "$.optimizedRoutes",
+      "Next": "CalculateCarbonImpact"
+    },
+    "CalculateCarbonImpact": {
+      "Type": "Task",
+      "Resource": "${CarbonCalculatorFunction}",
+      "Parameters": {
+        "routes.$": "$.optimizedRoutes.routes"
+      },
+      "ResultPath": "$.carbonImpact",
+      "Next": "PrepareResponse"
+    },
+    "PrepareResponse": {
+      "Type": "Pass",
+      "Parameters": {
+        "routes.$": "$.optimizedRoutes.routes",
+        "carbonImpact.$": "$.carbonImpact",
+        "requestId.$": "$$.Execution.Id"
+      },
+      "End": true
+    }
+  }
+}
