@@ -1,4 +1,6 @@
-# ![Logo](logo.png) EcoCommute - Smart Public Transit Navigation Assistant
+# ![Logo](icon48.png) EcoCommute - Smart Public Transit Navigation Assistant
+
+![App](Extension Face.png)
 
 ## Project Overview
 EcoCommute is a comprehensive solution designed to make public transit more accessible, user-friendly, and environmentally sustainable. By combining real-time transit data, personalized route optimization, and gamification elements, EcoCommute encourages users to make eco-friendly transportation choices.
